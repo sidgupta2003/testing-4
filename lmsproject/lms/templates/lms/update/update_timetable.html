@@ -1,0 +1,50 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Update Timetable{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Update Timetable Entry</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label>Class:</label>
+                            <input type="text" class="form-control" value="{{ class.name }}" readonly>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Subject:</label>
+                            <input type="text" class="form-control" value="{{ subject.name }}" readonly>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Day of Week:</label>
+                            <input type="text" class="form-control" value="{{ timetable.day_of_week }}" readonly>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="start_time">Start Time:</label>
+                            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ timetable.start_time|time:'H:i' }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="end_time">End Time:</label>
+                            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ timetable.end_time|time:'H:i' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Update Timetable</button>
+                            <a href="{% url 'view_timetables' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

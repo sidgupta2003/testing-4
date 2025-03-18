@@ -1,0 +1,69 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}View Classes{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">All Classes</h4>
+                    <a href="{% url 'create_class' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Class
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if classes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Class Name</th>
+                                        <th>Total Subjects</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for class in classes %}
+                                    <tr>
+                                        <td>{{ class.id }}</td>
+                                        <td>{{ class.name }}</td>
+                                        <td>{{ class.subject_set.count }}</td>
+                                        <td>
+                                            <a href="{% url 'update_class' class.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <a href="{% url 'delete_class' class.id %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No classes found. Click the button above to create a new class.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

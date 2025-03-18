@@ -1,0 +1,289 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Instructor Dashboard{% endblock %}
+
+{% block sidebar_class %}instructor-sidebar{% endblock %}
+{% block navbar_class %}navbar-primary{% endblock %}
+{% block footer_class %}instructor-footer{% endblock %}
+
+{% block sidebar_title %}Instructor Panel{% endblock %}
+
+{% block sidebar_menu %}
+<div class="sidebar-menu">
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'instructor_dashboard' %}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#classesSubmenu">
+                <i class="fas fa-graduation-cap me-2"></i>My Classes
+                <i class="fas fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse" id="classesSubmenu">
+                <ul class="nav flex-column ms-3">
+                    {% for class in classes %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            {{ class.name }}
+                            <span class="badge bg-primary float-end">{{ class.students.count }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#subjectsSubmenu">
+                <i class="fas fa-book me-2"></i>My Subjects
+                <i class="fas fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse" id="subjectsSubmenu">
+                <ul class="nav flex-column ms-3">
+                    {% for subject in subjects %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            {{ subject.name }}
+                            <span class="badge bg-success float-end">{{ subject.class_id.name }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#quizzesSubmenu">
+                <i class="fas fa-tasks me-2"></i>Quizzes
+                <i class="fas fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse" id="quizzesSubmenu">
+                <ul class="nav flex-column ms-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'view_quizzes' %}">View All Quizzes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_quiz' %}">Create New Quiz</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="welcome-text">Welcome, {{ instructor.user.username }}!</h2>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-sm-6 mb-3">
+            <div class="card text-white bg-primary h-100">
+                <div class="card-body">
+                    <div class="card-body-icon float-end">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h6 class="text-uppercase">Total Students</h6>
+                    <h1 class="display-4">{{ total_students }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-3">
+            <div class="card text-white bg-success h-100">
+                <div class="card-body">
+                    <div class="card-body-icon float-end">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h6 class="text-uppercase">Classes</h6>
+                    <h1 class="display-4">{{ total_classes }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-3">
+            <div class="card text-white bg-warning h-100">
+                <div class="card-body">
+                    <div class="card-body-icon float-end">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h6 class="text-uppercase">Subjects</h6>
+                    <h1 class="display-4">{{ total_subjects }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-3">
+            <div class="card text-white bg-info h-100">
+                <div class="card-body">
+                    <div class="card-body-icon float-end">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h6 class="text-uppercase">Total Quizzes</h6>
+                    <h1 class="display-4">{{ total_quizzes }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Students and Quiz Attempts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>Recent Students
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for student in recent_students %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ student.user.username }}</h6>
+                                <small class="text-muted">{{ student.classes.all|join:", " }}</small>
+                            </div>
+                            <p class="mb-1">
+                                {% for subject in student.subjects.all %}
+                                <span class="badge bg-primary me-1">{{ subject.name }}</span>
+                                {% endfor %}
+                            </p>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item">No students found.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Recent Quiz Attempts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for attempt in recent_quiz_attempts %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ attempt.student.user.username }}</h6>
+                                <small class="text-muted">{{ attempt.completed_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1">
+                                <span class="badge bg-primary me-2">{{ attempt.quiz.title }}</span>
+                                <span class="badge {% if attempt.score >= attempt.quiz.exam.passing_marks %}bg-success{% else %}bg-danger{% endif %}">
+                                    Score: {{ attempt.score }}/{{ attempt.quiz.total_questions }}
+                                </span>
+                            </p>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item">No quiz attempts yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bell me-2"></i>Recent Notifications
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for notification in notifications %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ notification.title }}</h6>
+                                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1">{{ notification.description }}</p>
+                        </div>
+                        {% endfor %}
+                        {% for notification in all_notifications %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ notification.title }}</h6>
+                                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1">{{ notification.description }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item">No notifications available.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .welcome-text {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        padding: 1rem;
+    }
+    .card-body-icon {
+        font-size: 2rem;
+        opacity: 0.3;
+    }
+    .list-group-item {
+        border: none;
+        margin-bottom: 0.5rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+    .list-group-item:last-child {
+        margin-bottom: 0;
+    }
+    .badge {
+        padding: 0.5em 0.8em;
+    }
+    .sidebar-menu .nav-link {
+        color: #4a5568;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    .sidebar-menu .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+    }
+    .sidebar-menu .nav-link.active {
+        background-color: #e2e8f0;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    .sidebar-menu .collapse {
+        background-color: #f8f9fa;
+    }
+    .sidebar-menu .collapse .nav-link {
+        padding-left: 2rem;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

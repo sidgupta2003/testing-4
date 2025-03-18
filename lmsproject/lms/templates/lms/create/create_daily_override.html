@@ -1,0 +1,231 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Daily Override{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Daily Override</h2>
+    <form id="dailyOverrideForm" method="POST" action="{% url 'create_daily_override' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="class_id">Select Class:</label>
+            <select class="form-control" id="class_id" name="class_id" required>
+                <option value="">Select a class</option>
+                {% for class in classes %}
+                    <option value="{{ class.id }}">{{ class.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="dateSection" style="display: none;">
+            <div class="form-group">
+                <label for="override_date">Select Date:</label>
+                <input type="date" class="form-control" id="override_date" name="override_date" required>
+            </div>
+        </div>
+
+        <div id="subjectsSection" style="display: none;">
+            <h4>Adjust Subject Times</h4>
+            <div id="subjectsList">
+                <!-- Subject rows will be added here dynamically -->
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Create Override</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .subject-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 15px;
+        align-items: center;
+    }
+
+    .time-input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .time-input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+        background: #4a90e2;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #357abd;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .success-message {
+        color: #28a745;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const classSelect = document.getElementById('class_id');
+    const dateSection = document.getElementById('dateSection');
+    const subjectsSection = document.getElementById('subjectsSection');
+    const subjectsList = document.getElementById('subjectsList');
+    const form = document.getElementById('dailyOverrideForm');
+
+    function getDayOfWeek(dateString) {
+        const date = new Date(dateString);
+        let day = date.getDay();
+        if (day === 0) day = 7;  // Sunday
+        return day;
+    }
+
+    classSelect.addEventListener('change', function() {
+        const classId = this.value;
+        if (!classId) {
+            dateSection.style.display = 'none';
+            subjectsSection.style.display = 'none';
+            return;
+        }
+
+        fetch(`/get_timetable_data/?class_id=${classId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.timetables && data.timetables.length > 0) {
+                    dateSection.style.display = 'block';
+                    document.getElementById('override_date').value = '';
+                    subjectsSection.style.display = 'none';
+                } else {
+                    dateSection.style.display = 'none';
+                    subjectsSection.style.display = 'none';
+                    alert('No timetable exists for this class. Please create a timetable first.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error checking timetable data');
+            });
+    });
+
+    document.getElementById('override_date').addEventListener('change', function() {
+        const classId = classSelect.value;
+        const selectedDate = this.value;
+        
+        if (!classId || !selectedDate) {
+            subjectsSection.style.display = 'none';
+            return;
+        }
+
+        fetch(`/get_timetable_data/?class_id=${classId}`)
+            .then(response => response.json())
+            .then(data => {
+                const dayOfWeek = getDayOfWeek(selectedDate);
+                console.log('Selected day of week:', dayOfWeek);
+                console.log('Available timetables:', data.timetables);
+
+                const dayTimetables = data.timetables.filter(t => parseInt(t.day_of_week) === dayOfWeek);
+                console.log('Filtered timetables for day:', dayTimetables);
+
+                if (dayTimetables.length > 0) {
+                    const subjectsHtml = dayTimetables.map(entry => `
+                        <div class="subject-row">
+                            <div class="subject-name">${entry.subject_name}</div>
+                            <div class="time-input-group">
+                                <input type="time" 
+                                       name="start_time_${entry.subject_id}" 
+                                       class="time-input"
+                                       value="${entry.start_time.substring(0, 5)}"
+                                       required>
+                            </div>
+                            <div class="time-input-group">
+                                <input type="time" 
+                                       name="end_time_${entry.subject_id}" 
+                                       class="time-input"
+                                       value="${entry.end_time.substring(0, 5)}"
+                                       required>
+                            </div>
+                            <input type="hidden" name="subject_ids[]" value="${entry.subject_id}">
+                        </div>
+                    `).join('');
+
+                    subjectsList.innerHTML = subjectsHtml;
+                    subjectsSection.style.display = 'block';
+                } else {
+                    subjectsSection.style.display = 'none';
+                    alert(`No subjects scheduled for ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][dayOfWeek - 1]} in the timetable.`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading subject data');
+            });
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const subjectRows = document.querySelectorAll('.subject-row');
+        
+        // Add subject data to formData
+        subjectRows.forEach(row => {
+            const subjectId = row.querySelector('input[name="subject_ids[]"]').value;
+            const startTime = row.querySelector(`input[name="start_time_${subjectId}"]`).value;
+            const endTime = row.querySelector(`input[name="end_time_${subjectId}"]`).value;
+            
+            formData.append('subjects[]', JSON.stringify({
+                subject_id: subjectId,
+                start_time: startTime,
+                end_time: endTime
+            }));
+        });
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.message || 'Error creating daily override');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting form');
+        });
+    });
+});
+</script>
+{% endblock %}

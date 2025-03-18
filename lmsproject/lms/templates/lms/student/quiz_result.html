@@ -1,0 +1,144 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Quiz Results{% endblock %}
+
+{% block sidebar_class %}student-sidebar{% endblock %}
+{% block navbar_class %}navbar-success{% endblock %}
+{% block footer_class %}student-footer{% endblock %}
+
+{% block sidebar_title %}Student Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Quiz Results</li>
+        </ol>
+    </nav>
+
+    <!-- Quiz Result Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header {% if quiz_attempt.score >= quiz_attempt.quiz.exam.passing_marks %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>{{ quiz_attempt.quiz.title }} - Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Quiz Details</h6>
+                            <p><strong>Subject:</strong> {{ quiz_attempt.quiz.exam.subject.name }}</p>
+                            <p><strong>Class:</strong> {{ quiz_attempt.quiz.exam.class_id.name }}</p>
+                            <p><strong>Total Questions:</strong> {{ quiz_attempt.quiz.total_questions }}</p>
+                            <p><strong>Passing Marks:</strong> {{ quiz_attempt.quiz.exam.passing_marks }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Your Performance</h6>
+                            <p><strong>Score:</strong> {{ quiz_attempt.score }}/{{ quiz_attempt.quiz.total_questions }}</p>
+                            {% comment %} <p><strong>Percentage:</strong> {{ quiz_attempt.score|divisibleby:quiz_attempt.quiz.total_questions|multiply:100 }}%</p> {% endcomment %}
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if quiz_attempt.score >= quiz_attempt.quiz.exam.passing_marks %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if quiz_attempt.score >= quiz_attempt.quiz.exam.passing_marks %}Passed{% else %}Failed{% endif %}
+                                </span>
+                            </p>
+                            <p><strong>Completed on:</strong> {{ quiz_attempt.completed_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question-wise Analysis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    {% comment %} <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Question-wise Analysis
+                    </h5> {% endcomment %}
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for question_attempt in quiz_attempt.questionattempt_set.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Question {{ forloop.counter }}</h6>
+                                    <p class="mb-2">{{ question_attempt.question.text }}</p>
+                                    {% if question_attempt.question.image %}
+                                    <img src="{{ question_attempt.question.image.url }}" alt="Question Image" class="img-fluid mb-2" style="max-width: 300px;">
+                                    {% endif %}
+                                    <div class="options-list">
+                                        <p class="mb-1"><strong>Your Answer:</strong> 
+                                            <span class="{% if question_attempt.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                                {{ question_attempt.selected_option }}
+                                            </span>
+                                        </p>
+                                        <p class="mb-0"><strong>Correct Answer:</strong> 
+                                            <span class="text-success">{{ question_attempt.question.correct_answer }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="badge {% if question_attempt.is_correct %}bg-success{% else %}bg-danger{% endif %} ms-3">
+                                    {% if question_attempt.is_correct %}Correct{% else %}Incorrect{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        padding: 1rem;
+    }
+    .list-group-item {
+        border: none;
+        margin-bottom: 0.5rem;
+        border-radius: 5px;
+        padding: 1.25rem;
+    }
+    .list-group-item:last-child {
+        margin-bottom: 0;
+    }
+    .badge {
+        padding: 0.5em 0.8em;
+        font-size: 0.875rem;
+    }
+    .options-list {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+    .breadcrumb-item a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

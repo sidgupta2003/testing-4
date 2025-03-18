@@ -1,0 +1,63 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Import Instructors{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Import Instructors</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="alert alert-info">
+                        <p>Upload a CSV file to import instructors. The CSV file should have the following columns:</p>
+                        <ul>
+                            <li>username (required)</li>
+                            <li>email (required)</li>
+                            <li>password (required)</li>
+                            <li>specialization (optional)</li>
+                            <li>classes (comma-separated class IDs)</li>
+                            <li>subjects (comma-separated subject IDs)</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_csv_file" class="form-label required-field">CSV File</label>
+                            <input type="file" name="csv_file" id="id_csv_file" class="form-control" accept=".csv" required>
+                            {% if form.csv_file.errors %}
+                                <div class="form-error">
+                                    {% for error in form.csv_file.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Import Instructors</button>
+                            <a href="{% url 'view_instructors' %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,58 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Student Notifications{% endblock %}
+
+{% block sidebar_class %}student-sidebar{% endblock %}
+{% block navbar_class %}navbar-success{% endblock %}
+{% block footer_class %}student-footer{% endblock %}
+
+{% block sidebar_title %}Student Panel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        <div class="list-group">
+                            {% for notification in notifications %}
+                                <div class="list-group-item list-group-item-action mb-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ notification.title }}</h5>
+                                        <small class="text-muted">{{ notification.created_at|date:"M d, Y h:i A" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ notification.description }}</p>
+                                    {% if notification.image %}
+                                        <div class="mt-3">
+                                            <img src="{{ notification.image.url }}" alt="Notification image" class="img-fluid rounded" style="max-height: 300px;">
+                                        </div>
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        <span class="badge {% if notification.create_for == 'all' %}bg-info{% else %}bg-success{% endif %}">
+                                            {% if notification.create_for == 'all' %}
+                                                General Announcement
+                                            {% else %}
+                                                For You
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No notifications available.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

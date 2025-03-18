@@ -1,0 +1,159 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block title %}Add Timetable Entry{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Add Timetable Entry for {{ day_name }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="class_id" class="form-label">Class</label>
+                    <select class="form-select" id="class_id" name="class_id" required onchange="loadSubjects()">
+                        <option value="">Select Class</option>
+                        {% for class in classes %}
+                            <option value="{{ class.id }}" {% if class.id|stringformat:"s" == class_id %}selected{% endif %}>
+                                {{ class.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <select class="form-select" id="subject" name="subject" required>
+                        <option value="">Select Subject</option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="start_time" class="form-label">Start Time</label>
+                    <input type="time" class="form-control" id="start_time" name="start_time" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="end_time" class="form-label">End Time</label>
+                    <input type="time" class="form-control" id="end_time" name="end_time" required>
+                </div>
+
+                <input type="hidden" name="day" value="{{ day }}">
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Add Entry</button>
+                    <a href="{% url 'view_timetables' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadSubjects() {
+    const classId = document.getElementById('class_id').value;
+    const subjectSelect = document.getElementById('subject');
+    
+    if (!classId) {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        return;
+    }
+
+    fetch(`/get_subjects_for_timetable/?class_id=${classId}`)
+        .then(response => response.json())
+        .then(data => {
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            data.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.id;
+                option.textContent = subject.name;
+                subjectSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading subjects:', error);
+            subjectSelect.innerHTML = '<option value="">Error loading subjects</option>';
+        });
+}
+
+// Load subjects on page load if class is selected
+document.addEventListener('DOMContentLoaded', function() {
+    const classId = document.getElementById('class_id').value;
+    if (classId) {
+        loadSubjects();
+    }
+});
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+.card-title {
+    margin-bottom: 0;
+    color: #2c3e50;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-control, .form-select {
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+.btn-primary:hover {
+    background-color: #357abd;
+    border-color: #357abd;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+</style>
+{% endblock %} 

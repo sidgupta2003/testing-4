@@ -1,0 +1,89 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Edit Quiz - {{ quiz.title }}{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Edit Quiz</h4>
+                    <div>
+                        <a href="{% url 'view_quiz' quiz.id %}" class="custom-button secondary-button me-2">
+                            <i class="fas fa-eye"></i> View Quiz
+                        </a>
+                        <a href="{% url 'view_quizzes' %}" class="custom-button primary-button">
+                            <i class="fas fa-arrow-left"></i> Back to Quizzes
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_exam" class="form-label required-field">{{ form.exam.label }}</label>
+                            {{ form.exam }}
+                            {% if form.exam.errors %}
+                                <div class="form-error">
+                                    {% for error in form.exam.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_title" class="form-label required-field">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="form-error">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_total_questions" class="form-label required-field">{{ form.total_questions.label }}</label>
+                            {{ form.total_questions }}
+                            {% if form.total_questions.errors %}
+                                <div class="form-error">
+                                    {% for error in form.total_questions.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Current number of questions: {{ current_questions_count }}. 
+                                {% if current_questions_count > 0 %}
+                                    <strong>Note:</strong> If you reduce the total questions, some questions may be removed.
+                                {% endif %}
+                            </small>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Update Quiz</button>
+                            <a href="{% url 'view_quiz' quiz.id %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

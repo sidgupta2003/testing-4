@@ -1,0 +1,78 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Update Subject{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Update Subject</h4>
+                    <a href="{% url 'view_subjects' %}" class="custom-button primary-button">
+                        <i class="fas fa-arrow-left"></i> Back to Subjects
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_subject_name" class="form-label required-field">Subject Name</label>
+                            {{ form.subject_name }}
+                            {% if form.subject_name.errors %}
+                                <div class="form-error">
+                                    {% for error in form.subject_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_class_id" class="form-label required-field">Class</label>
+                            {{ form.class_id }}
+                            {% if form.class_id.errors %}
+                                <div class="form-error">
+                                    {% for error in form.class_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            {% comment %} <label for="id_description" class="form-label">Description</label> {% endcomment %}
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="form-error">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Update Subject</button>
+                            <a href="{% url 'view_subjects' %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

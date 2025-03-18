@@ -1,0 +1,42 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Class{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Class</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_name" class="form-label required-field">Class Name</label>
+                            <input type="text" name="name" id="id_name" class="custom-input" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Create Class</button>
+                            <a href="{% url 'view_classes' %}" class="custom-button secondary-button">View All Classes</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

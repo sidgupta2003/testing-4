@@ -1,0 +1,223 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Notification{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-bell me-2"></i>Create New Notification</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Notification Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Create For:</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="create_for" id="all" value="all" checked>
+                                <label class="btn btn-outline-primary" for="all">All</label>
+                                
+                                <input type="radio" class="btn-check" name="create_for" id="student" value="student">
+                                <label class="btn btn-outline-primary" for="student">Students</label>
+                                
+                                <input type="radio" class="btn-check" name="create_for" id="instructor" value="instructor">
+                                <label class="btn btn-outline-primary" for="instructor">Instructors</label>
+                            </div>
+                        </div>
+
+                        <!-- Class Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Class:</label>
+                            <select class="form-select" id="class-select" name="class">
+                                <option value="">Select a class</option>
+                                {% for class in classes %}
+                                <option value="{{ class.id }}">{{ class.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Students Selection (Hidden by default) -->
+                        <div class="mb-4 recipient-section" id="students-section" style="display: none;">
+                            <label class="form-label">Select Students:</label>
+                            <div class="mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input select-all-students" type="checkbox" id="select-all-students">
+                                    <label class="form-check-label" for="select-all-students">
+                                        Select All Students
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="student-list" style="max-height: 200px; overflow-y: auto;">
+                                <!-- Students will be populated here dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Instructors Selection (Hidden by default) -->
+                        <div class="mb-4 recipient-section" id="instructors-section" style="display: none;">
+                            <label class="form-label">Select Instructors:</label>
+                            <div class="mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input select-all-instructors" type="checkbox" id="select-all-instructors">
+                                    <label class="form-check-label" for="select-all-instructors">
+                                        Select All Instructors
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="instructor-list" style="max-height: 200px; overflow-y: auto;">
+                                <!-- Instructors will be populated here dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Notification Content -->
+                        <div class="mb-4">
+                            <label class="form-label">Title:</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Description:</label>
+                            <textarea class="form-control" name="description" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Image (Optional):</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Send Notification
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const createForRadios = document.querySelectorAll('input[name="create_for"]');
+    const classSelect = document.getElementById('class-select');
+    const studentsSection = document.getElementById('students-section');
+    const instructorsSection = document.getElementById('instructors-section');
+    const selectAllStudents = document.querySelector('.select-all-students');
+    const selectAllInstructors = document.querySelector('.select-all-instructors');
+
+    // Handle create_for radio changes
+    createForRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'student') {
+                studentsSection.style.display = 'block';
+                instructorsSection.style.display = 'none';
+            } else if (this.value === 'instructor') {
+                studentsSection.style.display = 'none';
+                instructorsSection.style.display = 'block';
+            } else {
+                studentsSection.style.display = 'none';
+                instructorsSection.style.display = 'none';
+            }
+        });
+    });
+
+    // Handle class selection change
+    classSelect.addEventListener('change', function() {
+        const classId = this.value;
+        if (classId) {
+            // Fetch students for the selected class
+            fetch(`/get_students/${classId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const studentList = document.querySelector('.student-list');
+                    studentList.innerHTML = data.students.map(student => `
+                        <div class="form-check">
+                            <input class="form-check-input student-checkbox" type="checkbox" 
+                                   name="students" value="${student.id}" id="student-${student.id}">
+                            <label class="form-check-label" for="student-${student.id}">
+                                ${student.username}
+                            </label>
+                        </div>
+                    `).join('');
+                });
+
+            // Fetch instructors for the selected class
+            fetch(`/get_instructors/${classId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const instructorList = document.querySelector('.instructor-list');
+                    instructorList.innerHTML = data.instructors.map(instructor => `
+                        <div class="form-check">
+                            <input class="form-check-input instructor-checkbox" type="checkbox" 
+                                   name="instructors" value="${instructor.id}" id="instructor-${instructor.id}">
+                            <label class="form-check-label" for="instructor-${instructor.id}">
+                                ${instructor.username}
+                            </label>
+                        </div>
+                    `).join('');
+                });
+        }
+    });
+
+    // Handle select all students
+    selectAllStudents.addEventListener('change', function() {
+        const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+        studentCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    // Handle select all instructors
+    selectAllInstructors.addEventListener('change', function() {
+        const instructorCheckboxes = document.querySelectorAll('.instructor-checkbox');
+        instructorCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+.card-header {
+    border-radius: 15px 15px 0 0;
+}
+.form-check {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+.recipient-section {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.btn-group {
+    border-radius: 10px;
+    overflow: hidden;
+}
+.btn-check:checked + .btn-outline-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+</style>
+{% endblock %}
+{% endblock %}

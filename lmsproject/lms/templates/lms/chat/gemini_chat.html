@@ -1,0 +1,151 @@
+<!-- filepath: c:\Users\BPIN\OneDrive\Desktop\project\lmsproject\lms\templates\lms\chat\gemini_chat.html -->
+{% extends 'lms/base.html' %}
+
+{% block title %}Gemini Chat{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Chat with Gemini AI</h2>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <div class="input-group mb-3">
+            <input type="text" id="user-input" class="form-control" placeholder="Type your message here...">
+            <button id="send-button" class="btn btn-primary">Send</button>
+        </div>
+        <div id="loading" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    const loading = document.getElementById('loading');
+
+    function addMessage(text, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(type);
+        messageDiv.textContent = text;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (message === '') return;
+
+        // Display user message
+        addMessage(message, 'user-message');
+        userInput.value = '';
+        
+        // Show loading indicator
+        loading.classList.remove('d-none');
+        sendButton.disabled = true;
+
+        try {
+            const response = await fetch(`{% url 'gemini_ai_chat' %}?query=${encodeURIComponent(message)}`);
+            const data = await response.json();
+
+            if (data.response) {
+                addMessage(data.response, 'ai-message');
+            } else if (data.error) {
+                addMessage(`Error: ${data.error}`, 'error-message');
+            }
+        } catch (error) {
+            addMessage(`Error: ${error.message}`, 'error-message');
+        } finally {
+            // Hide loading indicator
+            loading.classList.add('d-none');
+            sendButton.disabled = false;
+        }
+    }
+
+    // Send message on button click
+    sendButton.addEventListener('click', sendMessage);
+
+    // Send message on Enter key
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+});
+</script>
+
+<style>
+#chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#chat-box {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+}
+
+.user-message, .ai-message {
+    max-width: 80%;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.ai-message {
+    background-color: #e9ecef;
+    color: #212529;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+.error-message {
+    text-align: center;
+    color: #dc3545;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f8d7da;
+    border-radius: 5px;
+}
+
+#loading {
+    margin: 10px 0;
+}
+
+.input-group {
+    margin-top: 15px;
+}
+
+#user-input {
+    border-radius: 20px 0 0 20px;
+    padding: 10px 15px;
+}
+
+#send-button {
+    border-radius: 0 20px 20px 0;
+    padding: 10px 25px;
+}
+</style>
+{% endblock %}

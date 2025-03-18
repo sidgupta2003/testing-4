@@ -1,0 +1,68 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Export Instructors{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Export Instructors</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="alert alert-info">
+                        <p>Select a class to export instructors from. The exported CSV file will contain the following information:</p>
+                        <ul>
+                            <li>Username</li>
+                            <li>Email</li>
+                            <li>Specialization</li>
+                            <li>Classes</li>
+                            <li>Subjects</li>
+                        </ul>
+                        <p><strong>Note:</strong> Passwords will not be included in the export for security reasons.</p>
+                    </div>
+                    
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_class" class="form-label required-field">Select Class</label>
+                            <select name="class_id" id="id_class" class="custom-select" required>
+                                <option value="">-- Select a Class --</option>
+                                {% for class in classes %}
+                                    <option value="{{ class.id }}">{{ class.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.class_id.errors %}
+                                <div class="form-error">
+                                    {% for error in form.class_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Export Instructors</button>
+                            <a href="{% url 'view_instructors' %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

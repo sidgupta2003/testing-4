@@ -1,0 +1,66 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Update Class{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Update Class</h4>
+                    <a href="{% url 'view_classes' %}" class="custom-button primary-button">
+                        <i class="fas fa-arrow-left"></i> Back to Classes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_class_name" class="form-label required-field">Class Name</label>
+                            {{ form.class_name }}
+                            {% if form.class_name.errors %}
+                                <div class="form-error">
+                                    {% for error in form.class_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            {% comment %} <label for="id_description" class="form-label">Description</label> {% endcomment %}
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="form-error">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Update Class</button>
+                            <a href="{% url 'view_classes' %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

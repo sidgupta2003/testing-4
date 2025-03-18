@@ -1,0 +1,482 @@
+/* Wrapper */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* Sidebar */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar ul li a {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar ul li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar ul li.active > a {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Role-specific sidebar styles */
+.admin-sidebar {
+    background: #343a40;
+}
+
+.instructor-sidebar {
+    background: #0d6efd;
+}
+
+.student-sidebar {
+    background: #198754;
+}
+
+/* Content */
+#content {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-container {
+    flex: 1;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+    padding: 15px 10px;
+    border: none;
+    border-radius: 0;
+}
+
+.navbar-dark {
+    background: #343a40;
+}
+
+.navbar-primary {
+    background: #0d6efd;
+}
+
+.navbar-success {
+    background: #198754;
+}
+
+/* Footer */
+.footer {
+    padding: 20px 0;
+    color: white;
+}
+
+.admin-footer {
+    background: #343a40;
+}
+
+.instructor-footer {
+    background: #0d6efd;
+}
+
+.student-footer {
+    background: #198754;
+}
+
+/* Buttons */
+#sidebarCollapse {
+    background: transparent;
+    border: none;
+    color: white;
+}
+
+#sidebarCollapse:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* User Dropdown */
+.dropdown-toggle::after {
+    display: none;
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+}
+
+/* Cards */
+.dashboard-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Icons */
+.fas {
+    margin-right: 10px;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    margin-bottom: 20px;
+} 
+
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.login-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+textarea.form-control {
+    min-height: 100px;
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    padding: 0.5rem 1rem;
+    margin: 0 2px;
+    border-radius: 4px;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Action Buttons */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+.btn-info {
+    color: #fff;
+}
+
+/* Card Modifications */
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+    padding: 1rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Alert Modifications */
+.alert {
+    margin-bottom: 1rem;
+    border: none;
+}
+
+.alert-info {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Required Field */
+.required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 4px;
+}
+
+/* Custom Form Styles */
+.custom-form {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.required-field::after {
+    content: "*";
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.custom-input,
+.custom-select,
+.custom-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    background-color: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.custom-input:focus,
+.custom-select:focus,
+.custom-textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+}
+
+.custom-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.custom-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.primary-button {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.secondary-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Form Validation Styles */
+.custom-input:invalid,
+.custom-select:invalid,
+.custom-textarea:invalid {
+    border-color: #dc3545;
+}
+
+.custom-input:invalid:focus,
+.custom-select:invalid:focus,
+.custom-textarea:invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Form Error Message */
+.form-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Form Success States */
+.custom-input:valid:not(:placeholder-shown),
+.custom-select:valid:not(:placeholder-shown),
+.custom-textarea:valid:not(:placeholder-shown) {
+    border-color: #28a745;
+}
+
+/* Responsive Form */
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .custom-button {
+        width: 100%;
+    }
+}
+
+/* Multiple Select Styles */
+select[multiple] {
+    height: auto;
+    min-height: 150px;
+}
+
+select[multiple] option {
+    padding: 10px;
+    margin-bottom: 1px;
+    border-radius: 4px;
+}
+
+select[multiple] option:checked {
+    background-color: #4a90e2 linear-gradient(0deg, #4a90e2 0%, #4a90e2 100%);
+    color: white;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* List Styles */
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 0;
+}
+
+.list-unstyled li {
+    padding: 3px 0;
+}
+
+/* Table Cell Styles */
+td ul {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

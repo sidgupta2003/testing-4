@@ -1,0 +1,333 @@
+<!-- filepath: c:\Users\BPIN\OneDrive\Desktop\project\lmsproject\lms\templates\lms\create\create_timetable.html -->
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Timetable{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Timetable Entry</h4>
+                    <small class="text-muted">This will create timetable entries for all days of the week</small>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" id="timetable-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_class_id" class="form-label">Class</label>
+                            {{ form.class_id }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Days</label>
+                            <div class="days-selection">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="1" id="day1" checked>
+                                    <label class="form-check-label" for="day1">Monday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="2" id="day2" checked>
+                                    <label class="form-check-label" for="day2">Tuesday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="3" id="day3" checked>
+                                    <label class="form-check-label" for="day3">Wednesday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="4" id="day4" checked>
+                                    <label class="form-check-label" for="day4">Thursday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="5" id="day5" checked>
+                                    <label class="form-check-label" for="day5">Friday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="6" id="day6" checked>
+                                    <label class="form-check-label" for="day6">Saturday</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="days[]" value="7" id="day7" checked>
+                                    <label class="form-check-label" for="day7">Sunday</label>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAllDays">Select All</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllDays">Deselect All</button>
+                            </div>
+                        </div>
+                        <div id="subjects-container"></div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Timetable Entries</button>
+                            <a href="{% url 'view_timetables' %}" class="btn btn-secondary">View All Timetables</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const classSelect = document.getElementById('id_class_id');
+    const subjectsContainer = document.getElementById('subjects-container');
+    const form = document.getElementById('timetable-form');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const selectAllBtn = document.getElementById('selectAllDays');
+    const deselectAllBtn = document.getElementById('deselectAllDays');
+
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const preSelectedClassId = urlParams.get('class_id');
+    const preSelectedDay = urlParams.get('day');
+
+    // If class_id is in URL, set it
+    if (preSelectedClassId) {
+        classSelect.value = preSelectedClassId;
+        fetchSubjects();
+    }
+
+    // If day is in URL, check only that day
+    if (preSelectedDay) {
+        // First uncheck all days
+        document.querySelectorAll('input[name="days[]"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        // Then check only the pre-selected day
+        const dayCheckbox = document.getElementById(`day${preSelectedDay}`);
+        if (dayCheckbox) {
+            dayCheckbox.checked = true;
+        }
+    }
+
+    // Add event listeners for select/deselect all buttons
+    selectAllBtn.addEventListener('click', function() {
+        document.querySelectorAll('input[name="days[]"]').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    });
+
+    deselectAllBtn.addEventListener('click', function() {
+        document.querySelectorAll('input[name="days[]"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+
+    function validateForm(event) {
+        const timeInputs = form.querySelectorAll('input[type="time"]');
+        const selectedDays = form.querySelectorAll('input[name="days[]"]:checked');
+        let isValid = true;
+        let errorMessage = '';
+
+        // Check if class is selected
+        if (!classSelect.value) {
+            errorMessage = 'Please select a class.';
+            isValid = false;
+        }
+
+        // Check if at least one day is selected
+        if (selectedDays.length === 0) {
+            errorMessage = 'Please select at least one day.';
+            isValid = false;
+        }
+
+        // Check if at least one subject has times set
+        let hasSubjectTimes = false;
+        timeInputs.forEach(input => {
+            if (input.value) hasSubjectTimes = true;
+        });
+
+        if (!hasSubjectTimes && isValid) {
+            errorMessage = 'Please set times for at least one subject.';
+            isValid = false;
+        }
+
+        // Validate time ranges
+        const subjects = {};
+        timeInputs.forEach(input => {
+            if (input.value) {
+                const [type, subjectId] = input.name.split('_').slice(0, 2);
+                if (!subjects[subjectId]) subjects[subjectId] = {};
+                subjects[subjectId][type] = input.value;
+            }
+        });
+
+        Object.entries(subjects).forEach(([subjectId, times]) => {
+            if (times.start && times.end) {
+                if (times.start >= times.end) {
+                    errorMessage = 'End time must be after start time for each subject.';
+                    isValid = false;
+                }
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault();
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                ${errorMessage}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            form.insertBefore(alertDiv, form.firstChild);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        return isValid;
+    }
+
+    function fetchSubjects() {
+        const classId = classSelect.value;
+
+        if (classId) {
+            // Show loading message
+            subjectsContainer.innerHTML = '<p class="text-center">Loading subjects...</p>';
+
+            fetch(`/get_subjects_for_timetable/?class_id=${classId}`, {
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                subjectsContainer.innerHTML = '';
+                if (data.subjects && data.subjects.length > 0) {
+                    data.subjects.forEach(subject => {
+                        const subjectDiv = document.createElement('div');
+                        subjectDiv.classList.add('mb-3', 'border', 'rounded', 'p-3');
+                        subjectDiv.innerHTML = `
+                            <label class="form-label fw-bold">${subject.name}</label>
+                            <div class="row g-3">
+                                <div class="col">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="time" name="start_time_${subject.id}" class="form-control" required>
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">End Time</label>
+                                    <input type="time" name="end_time_${subject.id}" class="form-control" required>
+                                </div>
+                            </div>
+                        `;
+                        subjectsContainer.appendChild(subjectDiv);
+                    });
+                } else {
+                    subjectsContainer.innerHTML = '<div class="alert alert-info">No subjects available for the selected class.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                subjectsContainer.innerHTML = '<div class="alert alert-danger">Error loading subjects. Please try again.</div>';
+            });
+        } else {
+            subjectsContainer.innerHTML = '';
+        }
+    }
+
+    // Add event listeners
+    classSelect.addEventListener('change', fetchSubjects);
+    form.addEventListener('submit', validateForm);
+
+    // Initial fetch if class is selected
+    if (classSelect.value) {
+        fetchSubjects();
+    }
+});
+</script>
+
+<style>
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.border {
+    border-color: #dee2e6 !important;
+}
+.rounded {
+    border-radius: 0.375rem !important;
+}
+.p-3 {
+    padding: 1rem !important;
+}
+.alert {
+    margin-bottom: 1rem;
+}
+.alert-dismissible {
+    padding-right: 3rem;
+}
+.days-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-check-inline {
+    margin-right: 1rem;
+}
+
+.form-check-input:checked {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+</style>
+{% endblock %}
+
+
+
+{% comment %} {% extends 'lms/base.html' %}
+
+{% block title %}Create Timetable{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Timetable Entry</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Timetable Entry</button>
+                            <a href="{% url 'view_timetables' %}" class="btn btn-secondary">View All Timetables</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% endcomment %}

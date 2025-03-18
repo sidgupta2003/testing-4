@@ -1,0 +1,85 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block sidebar_class %}student-sidebar{% endblock %}
+{% block navbar_class %}navbar-success{% endblock %}
+{% block footer_class %}student-footer{% endblock %}
+
+{% block sidebar_title %}Student Panel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'student_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'student_quizzes' %}">My Quizzes</a></li>
+                    <li class="breadcrumb-item active">{{ quiz.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-question-circle me-2"></i>{{ quiz.title }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Quiz Details</h6>
+                            <p class="mb-1">
+                                <i class="fas fa-book me-2"></i>Subject: {{ quiz.exam.subject.name }}
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-graduation-cap me-2"></i>Class: {{ quiz.exam.class_id.name }}
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-question me-2"></i>Total Questions: {{ quiz.total_questions }}
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Created: {{ quiz.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Exam Details</h6>
+                            <p class="mb-1">
+                                <i class="fas fa-file-alt me-2"></i>Exam: {{ quiz.exam.title }}
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-calendar me-2"></i>Exam Date: {{ quiz.exam.exam_date|date:"M d, Y" }}
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-star me-2"></i>Total Marks: {{ quiz.exam.total_marks }}
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-check-circle me-2"></i>Passing Marks: {{ quiz.exam.passing_marks }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if not quiz_attempt %}
+                        <div class="text-center mt-4">
+                            <p class="mb-3">Click the button below to start the quiz. Make sure you have enough time to complete it.</p>
+                            <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-play me-2"></i>Start Quiz
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>You have already attempted this quiz.
+                            <a href="{% url 'quiz_result' quiz.id %}" class="alert-link">View your results</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

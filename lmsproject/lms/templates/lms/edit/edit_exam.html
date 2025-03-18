@@ -1,0 +1,159 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Edit Exam{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Edit Exam</h4>
+                    <a href="{% url 'view_exams' %}" class="custom-button primary-button">
+                        <i class="fas fa-arrow-left"></i> Back to Exams
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_title" class="form-label required-field">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="form-error">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_class_id" class="form-label required-field">{{ form.class_id.label }}</label>
+                            {{ form.class_id }}
+                            {% if form.class_id.errors %}
+                                <div class="form-error">
+                                    {% for error in form.class_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_subject" class="form-label required-field">{{ form.subject.label }}</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                                <div class="form-error">
+                                    {% for error in form.subject.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_exam_date" class="form-label required-field">{{ form.exam_date.label }}</label>
+                            {{ form.exam_date }}
+                            {% if form.exam_date.errors %}
+                                <div class="form-error">
+                                    {% for error in form.exam_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_total_marks" class="form-label required-field">{{ form.total_marks.label }}</label>
+                            {{ form.total_marks }}
+                            {% if form.total_marks.errors %}
+                                <div class="form-error">
+                                    {% for error in form.total_marks.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_passing_marks" class="form-label required-field">{{ form.passing_marks.label }}</label>
+                            {{ form.passing_marks }}
+                            {% if form.passing_marks.errors %}
+                                <div class="form-error">
+                                    {% for error in form.passing_marks.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Update Exam</button>
+                            <a href="{% url 'view_exams' %}" class="custom-button secondary-button">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to load subjects based on selected class
+        function loadSubjects() {
+            var classId = $('#id_class_id').val();
+            var currentSubject = '{{ exam.subject.id }}';
+            
+            if (classId) {
+                $.ajax({
+                    url: '{% url "get_subjects_by_class" %}',
+                    data: {
+                        'class_id': classId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var subjectSelect = $('#id_subject');
+                        subjectSelect.empty();
+                        
+                        if (data.subjects.length > 0) {
+                            $.each(data.subjects, function(index, subject) {
+                                var option = $('<option></option>').attr('value', subject.id).text(subject.name);
+                                if (subject.id == currentSubject) {
+                                    option.attr('selected', 'selected');
+                                }
+                                subjectSelect.append(option);
+                            });
+                        } else {
+                            subjectSelect.append($('<option></option>').text('No subjects available for this class'));
+                        }
+                    }
+                });
+            } else {
+                $('#id_subject').empty().append($('<option></option>').text('Select a class first'));
+            }
+        }
+        
+        // Load subjects when the page loads
+        loadSubjects();
+        
+        // Load subjects when class selection changes
+        $('#id_class_id').change(loadSubjects);
+    });
+</script>
+{% endblock %} 

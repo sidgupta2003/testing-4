@@ -1,0 +1,173 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Quiz{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Quiz</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if step == 1 %}
+                        <form method="post" class="custom-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="1">
+                            
+                            <div class="form-group">
+                                <label for="id_exam" class="form-label required-field">{{ quiz_form.exam.label }}</label>
+                                {{ quiz_form.exam }}
+                                {% if quiz_form.exam.errors %}
+                                    <div class="form-error">
+                                        {% for error in quiz_form.exam.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_title" class="form-label required-field">{{ quiz_form.title.label }}</label>
+                                {{ quiz_form.title }}
+                                {% if quiz_form.title.errors %}
+                                    <div class="form-error">
+                                        {% for error in quiz_form.title.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_total_questions" class="form-label required-field">{{ quiz_form.total_questions.label }}</label>
+                                {{ quiz_form.total_questions }}
+                                {% if quiz_form.total_questions.errors %}
+                                    <div class="form-error">
+                                        {% for error in quiz_form.total_questions.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="custom-button primary-button">Next</button>
+                                <a href="{% url 'view_quizzes' %}" class="custom-button secondary-button">Cancel</a>
+                            </div>
+                        </form>
+                    {% elif step == 2 %}
+                        <div class="alert alert-info mb-4">
+                            <strong>Quiz:</strong> {{ quiz.title }}<br>
+                            <strong>Exam:</strong> {{ quiz.exam.title }}<br>
+                            <strong>Questions Remaining:</strong> {{ remaining_questions }}
+                        </div>
+                        
+                        <form method="post" action="{% url 'create_quiz_questions' quiz.id %}" class="custom-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="2">
+                            <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                            
+                            <div class="form-group">
+                                <label for="id_question_text" class="form-label required-field">{{ question_form.question_text.label }}</label>
+                                {{ question_form.question_text }}
+                                {% if question_form.question_text.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.question_text.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_option1" class="form-label required-field">{{ question_form.option1.label }}</label>
+                                {{ question_form.option1 }}
+                                {% if question_form.option1.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.option1.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_option2" class="form-label required-field">{{ question_form.option2.label }}</label>
+                                {{ question_form.option2 }}
+                                {% if question_form.option2.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.option2.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_option3" class="form-label required-field">{{ question_form.option3.label }}</label>
+                                {{ question_form.option3 }}
+                                {% if question_form.option3.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.option3.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_option4" class="form-label required-field">{{ question_form.option4.label }}</label>
+                                {{ question_form.option4 }}
+                                {% if question_form.option4.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.option4.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_correct_answer" class="form-label required-field">{{ question_form.correct_answer.label }}</label>
+                                {{ question_form.correct_answer }}
+                                {% if question_form.correct_answer.errors %}
+                                    <div class="form-error">
+                                        {% for error in question_form.correct_answer.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="custom-button primary-button">
+                                    {% if remaining_questions > 1 %}
+                                        Next Question
+                                    {% else %}
+                                        Finish Quiz
+                                    {% endif %}
+                                </button>
+                                <a href="{% url 'view_quizzes' %}" class="custom-button secondary-button">Cancel</a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

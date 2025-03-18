@@ -1,0 +1,54 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}View Daily Overrides{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Daily Overrides</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for daily_override in daily_overrides %}
+                            <tr>
+                                <td>{{ daily_override.class_id.name }}</td>
+                                <td>{{ daily_override.subject.name }}</td>
+                                <td>{{ daily_override.date }}</td>
+                                <td>{{ daily_override.start_time }}</td>
+                                <td>{{ daily_override.end_time }}</td>
+                                <td>
+                                    <a href="{% url 'update_daily_override' daily_override.id %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'delete_daily_override' daily_override.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this override?')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

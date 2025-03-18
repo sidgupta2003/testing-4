@@ -1,0 +1,80 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}View Students{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="student-notification-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Title</th>
+                    <th>Message</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notification in page_obj %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ notification.title }}</td>
+                    <td>{{ notification.description }}</td>
+                    <td>{{ notification.created_at }}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="openUpdateForm('{{ notification.id }}', '{{ notification.title }}', '{{ notification.description }}')">Update</button>
+                        <form method="post" action="{% url 'delete_notification' notification.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            <a href="?page={{ num }}" class="pagination-number {% if num == page_obj.number %}active{% endif %}">
+                {{ num }}
+            </a>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% comment %} <div id="updateForm" style="display:none;">
+<form method="post" action="{% url 'update_notification' %}">
+    {% csrf_token %}
+    <input type="hidden" name="notification_id" id="notification_id">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title">
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="button" class="btn btn-secondary" onclick="closeUpdateForm()">Cancel</button>
+</form>
+</div> {% endcomment %}
+
+{% endblock %}

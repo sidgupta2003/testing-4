@@ -1,0 +1,135 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}Create Student{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Student</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" class="custom-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="id_username" class="form-label required-field">Username</label>
+                            <input type="text" name="username" id="id_username" class="custom-input" required>
+                            {% if form.username.errors %}
+                                <div class="form-error">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_email" class="form-label required-field">Email</label>
+                            <input type="email" name="email" id="id_email" class="custom-input" required>
+                            {% if form.email.errors %}
+                                <div class="form-error">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_password" class="form-label required-field">Password</label>
+                            <input type="password" name="password" id="id_password" class="custom-input" required>
+                            {% if form.password.errors %}
+                                <div class="form-error">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_confirm_password" class="form-label required-field">Confirm Password</label>
+                            <input type="password" name="confirm_password" id="id_confirm_password" class="custom-input" required>
+                            {% if form.confirm_password.errors %}
+                                <div class="form-error">
+                                    {% for error in form.confirm_password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_classes" class="form-label required-field">Classes</label>
+                            <select name="classes" id="id_classes" class="custom-select" multiple required>
+                                {% for class in form.fields.classes.queryset %}
+                                    <option value="{{ class.id }}">{{ class.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Ctrl </small>
+                            {% if form.classes.errors %}
+                                <div class="form-error">
+                                    {% for error in form.classes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_subjects" class="form-label required-field">Subjects</label>
+                            <select name="subjects" id="id_subjects" class="custom-select" multiple required>
+                                {% for subject in form.fields.subjects.queryset %}
+                                    <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.class_id.name }})</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted"> Ctrl</small>
+                            {% if form.subjects.errors %}
+                                <div class="form-error">
+                                    {% for error in form.subjects.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="custom-button primary-button">Create Student</button>
+                            <a href="{% url 'view_students' %}" class="custom-button secondary-button">View All Students</a>
+                            <a href="{% url 'import_students' %}" class="custom-button secondary-button">
+                                <i class="fas fa-file-import"></i> Import Students
+                            </a>
+                            <a href="{% url 'export_students' %}" class="custom-button secondary-button">
+                                <i class="fas fa-file-export"></i> Export Students
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

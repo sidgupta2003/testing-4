@@ -1,0 +1,114 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}View Quizzes{% endblock %}
+
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block navbar_class %}navbar-dark{% endblock %}
+{% block footer_class %}admin-footer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Quizzes</h4>
+                    <a href="{% url 'create_quiz' %}" class="custom-button primary-button">Create Quiz</a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if quizzes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Quiz Title</th>
+                                        <th>Exam</th>
+                                        <th>Total Questions</th>
+                                        <th>Created By</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for quiz in quizzes %}
+                                        <tr>
+                                            <td>{{ quiz.title }}</td>
+                                            <td>{{ quiz.exam.title }}</td>
+                                            <td>{{ quiz.total_questions }}</td>
+                                            <td>{{ quiz.created_by.username }}</td>
+                                            <td>{{ quiz.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'view_quiz' quiz.id %}" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-danger btn-sm" 
+                                                   onclick="return confirm('Are you sure you want to delete this quiz?')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if quizzes.has_other_pages %}
+                            <nav aria-label="Quiz pagination" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    {% if quizzes.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ quizzes.previous_page_number }}">Previous</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Previous</span>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for i in quizzes.paginator.page_range %}
+                                        {% if quizzes.number == i %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ i }}</span>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if quizzes.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ quizzes.next_page_number }}">Next</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next</span>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            No quizzes have been created yet. 
+                            <a href="{% url 'create_quiz' %}" class="alert-link">Create your first quiz</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
