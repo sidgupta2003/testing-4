@@ -26,13 +26,13 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {% if messages %}
+                    {% comment %} {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }}">
                                 {{ message }}
                             </div>
                         {% endfor %}
-                    {% endif %}
+                    {% endif %} {% endcomment %}
 
                     {% if page_obj %}
                         <div class="table-responsive">

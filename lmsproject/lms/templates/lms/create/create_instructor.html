@@ -95,30 +95,22 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="id_classes" class="form-label required-field">Classes</label>
-                            <select name="classes" id="id_classes" class="custom-select" multiple required>
-                                {% for class in form.fields.classes.queryset %}
-                                    <option value="{{ class.id }}">{{ class.name }}</option>
+                            <label class="form-label required-field">Select Subjects</label>
+                            <div class="subjects-by-class">
+                                {% for class_name, subjects in subjects_by_class.items %}
+                                    <div class="class-subjects">
+                                        <h5>{{ class_name }}</h5>
+                                        <div class="checkbox-group">
+                                            {% for subject in subjects %}
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="subjects" value="{{ subject.id }}" id="subject_{{ subject.id }}" class="custom-checkbox">
+                                                    <label for="subject_{{ subject.id }}">{{ subject.name }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
                                 {% endfor %}
-                            </select>
-                            <small class="form-text text-muted">Ctrl</small>
-                            {% if form.classes.errors %}
-                                <div class="form-error">
-                                    {% for error in form.classes.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="id_subjects" class="form-label required-field">Subjects</label>
-                            <select name="subjects" id="id_subjects" class="custom-select" multiple required>
-                                {% for subject in form.fields.subjects.queryset %}
-                                    <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.class_id.name }})</option>
-                                {% endfor %}
-                            </select>
-                            <small class="form-text text-muted">Ctrl</small>
+                            </div>
                             {% if form.subjects.errors %}
                                 <div class="form-error">
                                     {% for error in form.subjects.errors %}
@@ -144,4 +136,35 @@
         </div>
     </div>
 </div>
+
+<style>
+.checkbox-group {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.subjects-by-class {
+    margin: 15px 0;
+}
+
+.class-subjects {
+    margin-bottom: 20px;
+}
+
+.class-subjects h5 {
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-check {
+    margin: 5px 0;
+}
+
+.custom-checkbox {
+    margin-right: 8px;
+}
+</style>
 {% endblock %} 

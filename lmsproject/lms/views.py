@@ -382,16 +382,31 @@ def create_student(request):
             # Create the student
             student = Student.objects.create(user=user)
             
+            # Get selected subjects and their classes
+            selected_subjects = form.cleaned_data['subjects']
+            classes = set(subject.class_id for subject in selected_subjects)
+            
             # Add classes and subjects
-            student.classes.set(form.cleaned_data['classes'])
-            student.subjects.set(form.cleaned_data['subjects'])
+            student.classes.set(classes)
+            student.subjects.set(selected_subjects)
             
             messages.success(request, 'Student created successfully.')
             return redirect('view_students')
     else:
         form = StudentForm()
     
-    return render(request, 'lms/create/create_student.html', {'form': form})
+    # Group subjects by class
+    subjects_by_class = {}
+    for subject in Subject.objects.all().select_related('class_id'):
+        class_name = subject.class_id.name
+        if class_name not in subjects_by_class:
+            subjects_by_class[class_name] = []
+        subjects_by_class[class_name].append(subject)
+    
+    return render(request, 'lms/create/create_student.html', {
+        'form': form,
+        'subjects_by_class': subjects_by_class
+    })
 
 @login_required
 def view_students(request):
@@ -479,16 +494,31 @@ def create_instructor(request):
                 specialization=form.cleaned_data['specialization']
             )
             
+            # Get selected subjects and their classes
+            selected_subjects = form.cleaned_data['subjects']
+            classes = set(subject.class_id for subject in selected_subjects)
+            
             # Add classes and subjects
-            instructor.classes.set(form.cleaned_data['classes'])
-            instructor.subjects.set(form.cleaned_data['subjects'])
+            instructor.classes.set(classes)
+            instructor.subjects.set(selected_subjects)
             
             messages.success(request, 'Instructor created successfully.')
             return redirect('view_instructors')
     else:
         form = InstructorForm()
     
-    return render(request, 'lms/create/create_instructor.html', {'form': form})
+    # Group subjects by class
+    subjects_by_class = {}
+    for subject in Subject.objects.all().select_related('class_id'):
+        class_name = subject.class_id.name
+        if class_name not in subjects_by_class:
+            subjects_by_class[class_name] = []
+        subjects_by_class[class_name].append(subject)
+    
+    return render(request, 'lms/create/create_instructor.html', {
+        'form': form,
+        'subjects_by_class': subjects_by_class
+    })
 
 @login_required
 def view_instructors(request):

@@ -16,13 +16,13 @@
                     <a href="{% url 'create_quiz' %}" class="custom-button primary-button">Create Quiz</a>
                 </div>
                 <div class="card-body">
-                    {% if messages %}
+                    {% comment %} {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }}">
                                 {{ message }}
                             </div>
                         {% endfor %}
-                    {% endif %}
+                    {% endif %} {% endcomment %}
 
                     {% if quizzes %}
                         <div class="table-responsive">

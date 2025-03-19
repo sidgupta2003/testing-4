@@ -44,14 +44,9 @@ class StudentForm(forms.Form):
         widget=forms.PasswordInput(attrs={'class': 'custom-input'}),
         required=True
     )
-    classes = forms.ModelMultipleChoiceField(
-        queryset=Class.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'custom-select'}),
-        required=True
-    )
     subjects = forms.ModelMultipleChoiceField(
-        queryset=Subject.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'custom-select'}),
+        queryset=Subject.objects.all().select_related('class_id'),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'custom-checkbox'}),
         required=True
     )
     
@@ -104,14 +99,9 @@ class InstructorForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'custom-input'}),
         required=False
     )
-    classes = forms.ModelMultipleChoiceField(
-        queryset=Class.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'custom-select'}),
-        required=True
-    )
     subjects = forms.ModelMultipleChoiceField(
-        queryset=Subject.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'custom-select'}),
+        queryset=Subject.objects.all().select_related('class_id'),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'custom-checkbox'}),
         required=True
     )
     

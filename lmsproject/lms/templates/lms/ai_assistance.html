@@ -1,0 +1,188 @@
+{% extends 'lms/base.html' %}
+
+{% block title %}AI Assistance{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2>AI Assistance</h2>
+            <p class="text-muted">Powered by Hugging Face Transformers</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Text Generation -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>Text Generation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="generateForm" class="ai-form">
+                        <div class="mb-3">
+                            <label for="generatePrompt" class="form-label">Enter your prompt:</label>
+                            <textarea class="form-control" id="generatePrompt" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate</button>
+                    </form>
+                    <div class="mt-3" id="generateResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Summarization -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-compress-alt me-2"></i>Text Summarization
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="summarizeForm" class="ai-form">
+                        <div class="mb-3">
+                            <label for="summarizeText" class="form-label">Enter text to summarize:</label>
+                            <textarea class="form-control" id="summarizeText" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Summarize</button>
+                    </form>
+                    <div class="mt-3" id="summarizeResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sentiment Analysis -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-smile me-2"></i>Sentiment Analysis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="sentimentForm" class="ai-form">
+                        <div class="mb-3">
+                            <label for="sentimentText" class="form-label">Enter text to analyze:</label>
+                            <textarea class="form-control" id="sentimentText" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-info">Analyze</button>
+                    </form>
+                    <div class="mt-3" id="sentimentResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Answering -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Question Answering
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="questionForm" class="ai-form">
+                        <div class="mb-3">
+                            <label for="context" class="form-label">Context:</label>
+                            <textarea class="form-control" id="context" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="question" class="form-label">Question:</label>
+                            <input type="text" class="form-control" id="question" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Ask</button>
+                    </form>
+                    <div class="mt-3" id="questionResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = {
+        'generateForm': {action: 'generate', resultDiv: 'generateResult'},
+        'summarizeForm': {action: 'summarize', resultDiv: 'summarizeResult'},
+        'sentimentForm': {action: 'sentiment', resultDiv: 'sentimentResult'},
+        'questionForm': {action: 'question', resultDiv: 'questionResult'}
+    };
+
+    for (const [formId, config] of Object.entries(forms)) {
+        document.getElementById(formId).addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById(config.resultDiv);
+            resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+            const formData = new FormData();
+            formData.append('action', config.action);
+
+            if (formId === 'questionForm') {
+                formData.append('context', document.getElementById('context').value);
+                formData.append('text', document.getElementById('question').value);
+            } else {
+                const textareaId = formId.replace('Form', 'Text');
+                formData.append('text', document.getElementById(textareaId).value);
+            }
+
+            try {
+                const response = await fetch("{% url 'ai_assistance' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                const data = await response.json();
+                let result = '';
+
+                if (config.action === 'sentiment') {
+                    result = `Label: ${data.label}<br>Score: ${(data.score * 100).toFixed(2)}%`;
+                } else if (config.action === 'generate') {
+                    result = data.generated_text;
+                } else if (config.action === 'summarize') {
+                    result = data.summary;
+                } else if (config.action === 'question') {
+                    result = `Answer: ${data.answer}<br>Confidence: ${(data.score * 100).toFixed(2)}%`;
+                }
+
+                resultDiv.innerHTML = `<div class="alert alert-success">${result}</div>`;
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+.card-header {
+    border-radius: 10px 10px 0 0;
+    padding: 1rem;
+}
+.form-control {
+    border-radius: 8px;
+}
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+}
+.alert {
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}
+{% endblock %} 

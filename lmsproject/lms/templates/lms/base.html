@@ -74,20 +74,31 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'view_timetables' %}">View Timetables</a>
+                        <a class="nav-link" href="{% url 'create_timetable' %}">
+                            <i class="fas fa-clock"></i>
+
+                            <span>Create Timetable</a></span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'view_daily_overrides' %}">View Daily Overrides</a>
+                        <a class="nav-link" href="{% url 'view_timetables' %}">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>View Timetables</a></span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_timetable' %}">Create Timetable</a>
+                        <a class="nav-link" href="{% url 'create_daily_override' %}">
+                            <i class="fas fa-redo"></i>
+                            <span>Create Override</a></span>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'view_daily_overrides' %}">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>View Overrides</a></span>
+                    </li>
+                    
                     {% comment %} <li class="nav-item">
                         <a class="nav-link" href="{% url 'view_daily_overrides' %}">Daily Overrides</a>
                     </li> {% endcomment %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_daily_override' %}">Create Daily Override</a>
-                    </li>
+                    
                     {% comment %} <li class="nav-item">
                         <a class="nav-link" href="{% url 'chat' %}">AI Chat</a>
                     </li>  {% endcomment %}
