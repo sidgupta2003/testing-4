@@ -14,11 +14,11 @@ from django.db.models import Q
 from django.urls import reverse
 import json
 from django import template
-import openai
+# import openai
 from django.conf import settings
 # from transformers import pipeline
-import requests
-import google.generativeai as genai
+# import requests
+# import google.generativeai as genai
 
 # from django.core.exceptions import PageNotAnInteger, EmptyPage
 

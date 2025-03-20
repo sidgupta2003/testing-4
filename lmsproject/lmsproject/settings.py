@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-lsp*d0s51r__$=)(q*lt^*g#iea)@^93(kd)#*$@phtp**&@a+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 
