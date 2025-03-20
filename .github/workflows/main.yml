@@ -1,0 +1,31 @@
+name: Deploy Django to EC2
+
+on:
+  push:
+    branches:
+      - main  # Change this if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up SSH Key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ec2_key.pem
+        chmod 600 ec2_key.pem
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+        cd ~/testing-4/lmsproject  # Ensure this is your actual project directory
+        git pull origin main  # Pull latest changes from GitHub
+        source ~/venv/bin/activate  # Ensure this is your actual virtual environment path
+        pip install -r requirements.txt  # Install dependencies
+        python manage.py migrate  # Apply database migrations
+        python manage.py collectstatic --noinput  # Collect static files
+        nohup python manage.py runserver 0.0.0.0:8000 &  # Restart Django server
+        EOF
