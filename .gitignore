@@ -1,2 +1,4 @@
 
 site-packages
+.env.local
+.env.prod
