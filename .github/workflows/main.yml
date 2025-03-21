@@ -3,7 +3,7 @@ name: Deploy Django to EC2
 on:
   push:
     branches:
-      - main  # Change this if needed
+      - main  # Change this if nee
 
 jobs:
   deploy:
@@ -15,34 +15,17 @@ jobs:
 
     - name: Set up SSH Key
       run: |
-        echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+        echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ec2_key.pem
         chmod 600 ec2_key.pem
 
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ~/testing-4/lmsproject  # Ensure this is your actual project directory
-
-          echo "Pulling latest changes from GitHub..."
-          git pull origin main  # Pull latest changes from GitHub
-
-          echo "Activating virtual environment..."
-          source ~/venv/bin/activate  # Ensure this is your actual virtual environment path
-
-          echo "Installing dependencies..."
-          pip install -r requirements.txt  # Install dependencies
-
-          echo "Applying database migrations..."
-          python manage.py migrate  # Apply database migrations
-
-          echo "Collecting static files..."
-          python manage.py collectstatic --noinput  # Collect static files
-
-          echo "Killing any existing Django server on port 8000..."
-          pkill -f "manage.py runserver" || echo "No existing server found"
-
-          echo "Starting Django development server in the background..."
-          nohup python manage.py runserver 0.0.0.0:8000 > django.log 2>&1 &
-
-          echo "Deployment completed!"
+        cd ~/testing-4/lmsproject  # Ensure this is your actual project directory
+        git pull origin main  # Pull latest changes from GitHub
+        source ~/venv/bin/activate  # Ensure this is your actual virtual environment path
+        pip install -r requirements.txt  # Install dependencies
+        python manage.py migrate  # Apply database migrations
+        python manage.py collectstatic --noinput  # Collect static files
+        nohup python manage.py runserver 0.0.0.0:8000 &  # Restart Django server
         EOF
