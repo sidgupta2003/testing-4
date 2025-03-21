@@ -3,7 +3,7 @@ name: Deploy Django to EC2
 on:
   push:
     branches:
-      - main  # Change this if nee
+      - main  # Deploy only when pushing to main
 
 jobs:
   deploy:
@@ -21,10 +21,10 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-        cd ~/testing-4/lmsproject  # Ensure this is your actual project directory
-        git pull origin main  # Pull latest changes from GitHub
-        source ~/venv/bin/activate  # Ensure this is your actual virtual environment path
-        pip install -r requirements.txt  # Install dependencies
+        cd ~/testing-4/lmsproject  # Go to project directory
+        git pull origin main  # Pull latest code
+        source ~/venv/bin/activate  # Activate virtual environment
+        pip install -r requirements.txt  # Install new dependencies
         python manage.py migrate  # Apply database migrations
         python manage.py collectstatic --noinput  # Collect static files
         nohup python manage.py runserver 0.0.0.0:8000 &  # Restart Django server
